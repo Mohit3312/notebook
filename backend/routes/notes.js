@@ -4,7 +4,7 @@ const fetchuser = require("../middleware/fetchuser");
 const Note = require("../models/Note");
 const { body, validationResult } = require("express-validator");
 
-// ROUTE 1: Get all the notes using: GET "/api/auth/fetchallnotes". Login required
+// ROUTE 1: Get all the notes using: GET "/api/notes/fetchallnotes". Login required
 router.get("/fetchallnotes", fetchuser, async (req, res) => {
   try {
     const notes = await Note.find({ user: req.user.id });
@@ -16,7 +16,7 @@ router.get("/fetchallnotes", fetchuser, async (req, res) => {
   }
 });
 
-// ROUTE 2: Add a new note using: POST "/api/auth/addnote". Login required
+// ROUTE 2: Add a new note using: POST "/api/notes/addnote". Login required
 router.post(
   "/addnote",
   fetchuser,
@@ -52,5 +52,39 @@ router.post(
     } catch (error) {}
   }
 );
+
+// ROUTE 3: Update an existing Note using: POST "/api/notes/updatenote". Login required
+
+router.put("/updatenote/:id", fetchuser, async (req, res) => {
+  const { title, description, tag } = req.body;
+
+  // Creating a newNote object
+  const newNote = {};
+  if (title) {
+    newNote.title = title;
+  }
+  if (description) {
+    newNote.description = description;
+  }
+  if (tag) {
+    newNote.tag = tag;
+  }
+
+  // Finding the note to be updated then updating it
+  let note = await Note.findById(req.params.id);
+  if (!note) {
+    res.status(404).send("Not found");
+  }
+  if (note.user.toString() !== req.user.id) {
+    return res.status(401).send("Not Allowed");
+  }
+
+  note = await Note.findByIdAndUpdate(
+    req.params.id,
+    { $set: newNote },
+    { new: true }
+  );
+  res.json({ note });
+});
 
 module.exports = router;
