@@ -2,15 +2,9 @@ import React, { useContext, useEffect } from "react";
 import NoteContext from "../context/notes/NoteContext";
 
 const About = () => {
-  const { state, update } = useContext(NoteContext);
-  useEffect(() => {
-    update("Kartik", "8A");
-    // eslint-disable-next-line
-  }, []);
-
   return (
     <div>
-      This is About component {state.name} and he is in Class - {state.class}
+      <h2 className="text-center my-3">This is About component</h2>
     </div>
   );
 };
