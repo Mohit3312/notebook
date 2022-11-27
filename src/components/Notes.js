@@ -5,8 +5,9 @@ import NoteItem from "./NoteItem";
 
 const Notes = () => {
   const context = useContext(NoteContext);
-  const { notes, getNotes } = context;
+  const { notes, getNotes, editNote } = context;
   const [note, setNote] = useState({
+    id: "",
     title: "",
     description: "",
     tag: "",
@@ -17,15 +18,17 @@ const Notes = () => {
   }, []);
 
   const ref = useRef(null);
+  const refClose = useRef(null);
 
-  const editNote = (currentNote) => {
+  const handleEditClick = (currentNote) => {
     ref.current.click();
-    setNote(currentNote);
+    const { title, description, tag } = currentNote;
+    setNote({ ...note, id: currentNote._id, title, description, tag });
   };
 
   const handleEditSubmit = (e) => {
-    e.preventDefault();
-    console.log("Updaing the notes", note);
+    editNote(note.id, note.title, note.description, note.tag);
+    refClose.current.click();
   };
   const onChange = (e) => {
     setNote({ ...note, [e.target.name]: e.target.value });
@@ -76,6 +79,8 @@ const Notes = () => {
                     aria-describedby="emailHelp"
                     onChange={onChange}
                     value={note.title}
+                    minLength={3}
+                    required
                   />
                 </div>
                 <div className="mb-3">
@@ -89,6 +94,8 @@ const Notes = () => {
                     name="description"
                     onChange={onChange}
                     value={note.description}
+                    minLength={5}
+                    required
                   />
                 </div>
                 <div className="mb-3">
@@ -111,6 +118,7 @@ const Notes = () => {
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
+                ref={refClose}
               >
                 Close
               </button>
@@ -118,6 +126,7 @@ const Notes = () => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleEditSubmit}
+                disabled={note.title.length < 3 || note.description.length < 5}
               >
                 Update Note
               </button>
@@ -127,8 +136,17 @@ const Notes = () => {
       </div>
       <div className="row">
         <h2 className="my-3">Your Notes</h2>
+        <div className="container ms-1">
+          {notes.length === 0 && "No notes to display"}
+        </div>
         {notes.map((note) => {
-          return <NoteItem key={note._id} editNote={editNote} note={note} />;
+          return (
+            <NoteItem
+              key={note._id}
+              handleEditClick={handleEditClick}
+              note={note}
+            />
+          );
         })}
       </div>
     </>

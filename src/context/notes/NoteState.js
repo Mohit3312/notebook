@@ -35,18 +35,7 @@ const NoteState = (props) => {
       body: JSON.stringify({ title, description, tag }),
     });
 
-    const json = await response.json();
-    console.log(json);
-
-    const note = {
-      _id: json._id,
-      user: json.user,
-      title: title,
-      description: description,
-      tag: tag,
-      date: json.date,
-      __v: json.__v,
-    };
+    const note = await response.json();
     setNotes(notes.concat(note));
   };
 
@@ -61,8 +50,7 @@ const NoteState = (props) => {
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjM3ZTVkNjE1OWRjZGI4MTNiOGNkNmJlIn0sImlhdCI6MTY2OTIyODk3NH0.ye34a_CUI9xElFvJ4H0-atwBZ0pf0wN_Rv4RO1rA3RQ",
       },
     });
-    const json = await response.json();
-    console.log(json);
+    await response.json();
 
     const newNotes = notes.filter((note) => {
       return note._id !== id;
@@ -83,14 +71,17 @@ const NoteState = (props) => {
       body: JSON.stringify({ title, description, tag }),
     });
     // Logic to edit on client side
-    for (let index = 0; index < notes.length; index++) {
-      const element = notes[index];
+    let newNotes = JSON.parse(JSON.stringify(notes));
+    for (let index = 0; index < newNotes.length; index++) {
+      const element = newNotes[index];
       if (element._id === id) {
-        element.title = title;
-        element.description = description;
-        element.tag = tag;
+        newNotes[index].title = title;
+        newNotes[index].description = description;
+        newNotes[index].tag = tag;
+        break;
       }
     }
+    setNotes(newNotes);
   };
   return (
     <NoteContext.Provider
