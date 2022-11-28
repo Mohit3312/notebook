@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import NoteContext from "../context/notes/NoteContext";
 import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const context = useContext(NoteContext);
+  const { showAlert } = context;
   const [credentials, setCredentials] = useState({
     name: "",
     email: "",
@@ -18,13 +21,13 @@ const Signup = () => {
       body: JSON.stringify(credentials),
     });
     const json = await response.json();
-    console.log(json);
     if (json.success) {
       // Save the token and redirect
       localStorage.setItem("token", json.authToken);
       navigate("/");
+      showAlert("success", "Account created successfully");
     } else {
-      alert(JSON.stringify(json));
+      showAlert("danger", "Invalid details");
     }
   };
 

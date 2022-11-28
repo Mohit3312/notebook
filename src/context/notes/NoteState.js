@@ -2,6 +2,16 @@ import NoteContext from "./NoteContext";
 import { useState } from "react";
 
 const NoteState = (props) => {
+  const [alert, setAlert] = useState(null);
+  const showAlert = (type, message) => {
+    setAlert({
+      type: type,
+      message: message,
+    });
+    setTimeout(() => {
+      setAlert(null);
+    }, 2000);
+  };
   const host = "http://localhost:5000";
   const notesInitial = [];
 
@@ -36,7 +46,12 @@ const NoteState = (props) => {
     });
 
     const note = await response.json();
-    setNotes(notes.concat(note));
+    if (note.success === true) {
+      showAlert("success", "Note has been added successfully");
+    } else {
+      showAlert("danger", note.message);
+    }
+    setNotes(notes.concat(note.message));
   };
 
   // Delete a Note
@@ -50,7 +65,12 @@ const NoteState = (props) => {
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjM3ZTVkNjE1OWRjZGI4MTNiOGNkNmJlIn0sImlhdCI6MTY2OTIyODk3NH0.ye34a_CUI9xElFvJ4H0-atwBZ0pf0wN_Rv4RO1rA3RQ",
       },
     });
-    await response.json();
+    const json = await response.json();
+    if (json.success === true) {
+      showAlert("success", "Note has been deleted successfully");
+    } else {
+      showAlert("danger", json.message);
+    }
 
     const newNotes = notes.filter((note) => {
       return note._id !== id;
@@ -61,7 +81,7 @@ const NoteState = (props) => {
   // Edit a Note
   const editNote = async (id, title, description, tag) => {
     // TODO: API Call
-    await fetch(`${host}/api/notes/updatenote/${id}`, {
+    const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -70,6 +90,13 @@ const NoteState = (props) => {
       },
       body: JSON.stringify({ title, description, tag }),
     });
+
+    const json = await response.json();
+    if (json.success === true) {
+      showAlert("success", "Note has been updated successfully");
+    } else {
+      showAlert("danger", json.message);
+    }
     // Logic to edit on client side
     let newNotes = JSON.parse(JSON.stringify(notes));
     for (let index = 0; index < newNotes.length; index++) {
@@ -85,7 +112,16 @@ const NoteState = (props) => {
   };
   return (
     <NoteContext.Provider
-      value={{ notes, setNotes, addNote, deleteNote, editNote, getNotes }}
+      value={{
+        notes,
+        setNotes,
+        addNote,
+        deleteNote,
+        editNote,
+        getNotes,
+        alert,
+        showAlert,
+      }}
     >
       {props.children}
     </NoteContext.Provider>

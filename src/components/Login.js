@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import NoteContext from "../context/notes/NoteContext";
 const Login = () => {
+  const context = useContext(NoteContext);
+  const { showAlert } = context;
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   let navigate = useNavigate();
   const handleLoginSubmit = async (e) => {
@@ -13,13 +16,13 @@ const Login = () => {
       body: JSON.stringify(credentials),
     });
     const json = await response.json();
-    console.log(json);
     if (json.success) {
       // Save the token and redirect
       localStorage.setItem("token", json.authToken);
       navigate("/");
+      showAlert("success", "Logged in successfully");
     } else {
-      alert("Invalid credentials");
+      showAlert("danger", "Invalid credentials");
     }
   };
 
