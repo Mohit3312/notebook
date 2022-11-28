@@ -36,6 +36,7 @@ const Signup = () => {
   };
   return (
     <div className="container">
+      <h2 className="text-center my-4">Create an account to use Notebook</h2>
       <form onSubmit={handleSignupSubmit}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">

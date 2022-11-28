@@ -19,8 +19,8 @@ const Login = () => {
     if (json.success) {
       // Save the token and redirect
       localStorage.setItem("token", json.authToken);
-      navigate("/");
       showAlert("success", "Logged in successfully");
+      navigate("/");
     } else {
       showAlert("danger", "Invalid credentials");
     }
@@ -30,7 +30,8 @@ const Login = () => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
   return (
-    <div>
+    <div className="container">
+      <h2 className="my-4 text-center">Log in to use Notebook</h2>
       <form onSubmit={handleLoginSubmit}>
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
